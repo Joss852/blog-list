@@ -43,9 +43,27 @@ const mostBlogs = blogs => {
   return ordered.sort((a, b) => b.blogs - a.blogs)[0]
 }
 
+const mostLikes = blogs => {
+  const authorsArr = blogs.map(blog => blog.author)
+  const authors = [...new Set(authorsArr)]
+
+  const ordered = authors.map(author => {
+    const filtered = blogs.filter(blog => blog.author === author)
+    const likes = filtered.reduce((acc, curr) => acc + curr.likes, 0)
+
+    return {
+      author,
+      likes,
+    }
+  })
+
+  return ordered.sort((a, b) => b.likes - a.likes)[0]
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 }
