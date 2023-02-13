@@ -27,8 +27,25 @@ const favoriteBlog = blogs => {
   return mappedBlogs.reduce(reducer)
 }
 
+const mostBlogs = blogs => {
+  const authorsArr = blogs.map(blog => blog.author)
+  const authors = [...new Set(authorsArr)]
+
+  const ordered = authors.map(author => {
+    const filtered = blogs.filter(blog => blog.author === author)
+
+    return {
+      author,
+      blogs: filtered.length,
+    }
+  })
+
+  return ordered.sort((a, b) => b.blogs - a.blogs)[0]
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  mostBlogs,
 }
