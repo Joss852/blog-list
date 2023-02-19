@@ -65,6 +65,21 @@ test('POST request successfully creates a new blog post', async () => {
   expect(lastBlog).toEqual(newBlog)
 })
 
+test('if likes property is missing, it will default to the value 0', async () => {
+  const newBlog = {
+    title: 'Test blog',
+    author: 'Test author',
+    url: 'https://test.com/',
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+
+  expect(response.body.likes).toBe(0)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
