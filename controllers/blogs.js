@@ -39,4 +39,12 @@ blogRouter.delete('/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
+blogRouter.put('/:id', (request, response, next) => {
+  Blog.findByIdAndUpdate(request.params.id, request.body, { new: true })
+    .then(result => {
+      response.status(200).json(result)
+    })
+    .catch(error => next(error))
+})
+
 module.exports = blogRouter

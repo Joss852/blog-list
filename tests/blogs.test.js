@@ -92,12 +92,30 @@ test('invalid blog posts are not added', async () => {
     .expect(400)
 })
 
-test.only('deleting a blog post', async () => {
+test('deleting a blog post', async () => {
   const blogs = await api.get('/api/blogs')
 
   const blogToDelete = blogs.body[0]
 
   await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+})
+
+test('updating a blog post', async () => {
+  const blogs = await api.get('/api/blogs')
+
+  const blogToUpdate = blogs.body[0]
+
+  const updatedBlog = {
+    ...blogToUpdate,
+    likes: 100,
+  }
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+    .expect(200)
+
+  expect(response.body.likes).toBe(100)
 })
 
 afterAll(async () => {
