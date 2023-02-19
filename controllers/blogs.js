@@ -9,6 +9,11 @@ blogRouter.get('/', (request, response) => {
 
 blogRouter.post('/', (request, response) => {
   const { title, author, url, likes } = request.body
+
+  if (!title || !url) {
+    response.status(400).send({ error: 'Title and URL are required' })
+  }
+
   const blog = new Blog({
     title,
     author,

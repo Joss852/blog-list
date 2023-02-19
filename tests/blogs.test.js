@@ -80,6 +80,18 @@ test('if likes property is missing, it will default to the value 0', async () =>
   expect(response.body.likes).toBe(0)
 })
 
+test.only('invalid blog posts are not added', async () => {
+  const invalidBlog = {
+    title: 'Test blog',
+    author: 'Test author',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(invalidBlog)
+    .expect(400)
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
