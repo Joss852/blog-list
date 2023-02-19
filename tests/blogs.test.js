@@ -34,7 +34,13 @@ test('correct amount of blog posts in the JSON format', async () => {
     .expect('Content-Type', /application\/json/)
 
   expect(response.body).toHaveLength(initialBlogs.length)
-}, 100000)
+})
+
+test('unique identifier is named id', async () => {
+  const response = await api.get('/api/blogs')
+
+  expect(response.body[0].id).toBeDefined()
+})
 
 afterAll(async () => {
   await mongoose.connection.close()
