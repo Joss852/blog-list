@@ -80,7 +80,7 @@ test('if likes property is missing, it will default to the value 0', async () =>
   expect(response.body.likes).toBe(0)
 })
 
-test.only('invalid blog posts are not added', async () => {
+test('invalid blog posts are not added', async () => {
   const invalidBlog = {
     title: 'Test blog',
     author: 'Test author',
@@ -90,6 +90,14 @@ test.only('invalid blog posts are not added', async () => {
     .post('/api/blogs')
     .send(invalidBlog)
     .expect(400)
+})
+
+test.only('deleting a blog post', async () => {
+  const blogs = await api.get('/api/blogs')
+
+  const blogToDelete = blogs.body[0]
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
 })
 
 afterAll(async () => {
