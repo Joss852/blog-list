@@ -1,16 +1,17 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
-blogRouter.get('/', (request, response, next) => {
-  Blog.find({})
-    .then(blogs => {
-      response.json(blogs)
-    })
-    .catch(error => next(error))
+blogRouter.get('/', async (request, response) => {
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
+
+  response.status(200).json(blogs)
 })
 
-blogRouter.post('/', (request, response, next) => {
+blogRouter.post('/', async (request, response) => {
   const { title, author, url, likes } = request.body
+
+  const user = await User.findById(request.body.userId)
 
   if (!title || !url) {
     response.status(400).send({ error: 'Title and URL are required' })
@@ -21,30 +22,30 @@ blogRouter.post('/', (request, response, next) => {
     author,
     url,
     likes: likes || 0,
+    user: user.id,
   })
 
-  blog
-    .save()
-    .then(result => {
-      response.status(201).json(result)
-    })
-    .catch(error => next(error))
+  const savedBlog = await blog.save()
+  user.blogs = user.blogs.concat(savedBlog.id)
+  await user.save()
+
+  response.status(201).json(savedBlog)
 })
 
-blogRouter.delete('/:id', (request, response, next) => {
-  Blog.findByIdAndRemove(request.params.id)
-    .then(() => {
-      response.status(204).end()
-    })
-    .catch(error => next(error))
+blogRouter.delete('/:id', async (request, response) => {
+  await Blog.findByIdAndRemove(request.params.id)
+  response.status(204).end()
 })
 
-blogRouter.put('/:id', (request, response, next) => {
-  Blog.findByIdAndUpdate(request.params.id, request.body, { new: true })
-    .then(result => {
-      response.status(200).json(result)
-    })
-    .catch(error => next(error))
+blogRouter.put('/:id', async (request, response) => {
+  const editedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    request.body,
+    {
+      new: true,
+    }
+  )
+  response.status(200).json(editedBlog)
 })
 
 module.exports = blogRouter
