@@ -10,10 +10,9 @@ const logger = require('./utils/logger')
 const mongoose = require('mongoose')
 const {
   requestLogger,
-  tokenExtractor,
-  userExtractor,
   unknownEndpoint,
   errorHandler,
+  userExtractor,
 } = require('./utils/middleware')
 
 mongoose.set('strictQuery', false)
@@ -33,11 +32,10 @@ app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
 app.use(requestLogger)
-app.use(tokenExtractor)
 
+app.use('/api/login', loginRouter)
 app.use('/api/blogs', userExtractor, blogRouter)
 app.use('/api/users', userRouter)
-app.use('/api/login', loginRouter)
 
 app.use(unknownEndpoint)
 app.use(errorHandler)

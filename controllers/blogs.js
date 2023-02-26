@@ -1,5 +1,6 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
+const { userExtractor } = require('../utils/middleware')
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -7,18 +8,14 @@ blogRouter.get('/', async (request, response) => {
   response.status(200).json(blogs)
 })
 
-blogRouter.post('/', async (request, response) => {
+blogRouter.post('/', userExtractor, async (request, response) => {
   const { title, author, url, likes } = request.body
 
+  // if (!title || !url) {
+  //   response.status(400).send({ error: 'Title and URL are required' })
+  // }
+
   const user = request.user
-
-  if (!user.id) {
-    return response.status(401).json({ error: 'invalid token' })
-  }
-
-  if (!title || !url) {
-    response.status(400).send({ error: 'Title and URL are required' })
-  }
 
   const blog = new Blog({
     title,
@@ -35,7 +32,7 @@ blogRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogRouter.delete('/:id', async (request, response) => {
+blogRouter.delete('/:id', userExtractor, async (request, response) => {
   const user = request.user
 
   if (!user.id) {
