@@ -1,10 +1,43 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
+const Comment = require('../models/comment')
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
 
   response.status(200).json(blogs)
+})
+
+blogRouter.get('/:id/comments', async (request, response) => {
+  if (!request.user) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+
+  const comments = await Comment.find({ blog: request.params.id })
+
+  if (!comments) {
+    return response.status(404).end()
+  }
+
+  response.status(200).json(comments)
+})
+
+blogRouter.post('/:id/comments', async (request, response) => {
+  if (!request.user) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+
+  if (!request.body.content) {
+    return response.status(400).send({ error: 'Comment content is required' })
+  }
+
+  const comment = new Comment({
+    content: request.body.content,
+  })
+
+  const savedComment = await comment.save()
+
+  response.status(200).json(savedComment)
 })
 
 blogRouter.post('/', async (request, response) => {
