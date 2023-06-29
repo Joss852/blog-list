@@ -33,6 +33,7 @@ blogRouter.post('/:id/comments', async (request, response) => {
 
   const comment = new Comment({
     content: request.body.content,
+    blog: request.body.id
   })
 
   const savedComment = await comment.save()
